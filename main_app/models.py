@@ -27,6 +27,8 @@ class Vehicle(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     plate_number = models.CharField(max_length=20)
     model = models.CharField(max_length=100)
+    # make
+    # year
 
     def __str__(self):
         return self.plate_number
