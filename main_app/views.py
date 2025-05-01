@@ -21,9 +21,11 @@ class VehicleViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Vehicle.objects.filter(user=self.request.user)
+        return Vehicle.objects.all()
+        # return Vehicle.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        print('request', self.request)
         serializer.save(user=self.request.user)
 
 # Reservation ViewSet

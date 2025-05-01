@@ -39,6 +39,7 @@ class ParkingSpotSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class VehicleSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Vehicle
         fields = '__all__'
