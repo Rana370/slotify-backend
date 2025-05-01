@@ -3,9 +3,18 @@ from .models import Vehicle, Reservation, Garage, ParkingSpot, Company
 from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email', 'password']
+
+    def create(self, validated_data):
+        return User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:

@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 
 class Company(models.Model):
     name = models.CharField(max_length=100)
+    passkey = models.CharField(max_length=100)
+    employees = models.ForeignKey(User, on_delete=models.CASCADE, related_name='company', null=True)
+
 
     def __str__(self):
         return self.name
