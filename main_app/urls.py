@@ -28,9 +28,7 @@ urlpatterns = [
     path('garages/<int:garage_id>/', GarageDetail.as_view(), name='garage-detail'),
     path('garages/<int:garage_id>/spots/', ParkingSpotViewSet.as_view(), name='garage-spots'),
     path('vehicles/users', VehicleViewSet.as_view(), name='user-vehicles'),
-
-    # 🔐 Auth endpoints
-    path('register/', RegisterView.as_view(), name='register'),   # signup
+    path('users/register/', RegisterView.as_view(), name='register'),   # signup
     path('users/login/', LoginView.as_view(), name='login'),      # custom login ✅
 
     # (Optional) JWT token endpoints if you still want them
