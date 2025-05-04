@@ -6,10 +6,9 @@ class Company(models.Model):
     passkey = models.CharField(max_length=100)
     employees = models.ForeignKey(User, on_delete=models.CASCADE, related_name='company', null=True)
 
-
     def __str__(self):
         return self.name
- 
+
 class Garage(models.Model):
     name = models.CharField(max_length=100)
     location = models.CharField(max_length=255)
@@ -27,11 +26,11 @@ class ParkingSpot(models.Model):
         return f"Spot {self.number} in {self.garage.name}"
 
 class Vehicle(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
     plate_number = models.CharField(max_length=20)
-    model = models.CharField(max_length=100)
-    # make
-    # year
+    model = models.CharField(max_length=50)
+    type = models.CharField(max_length=50)
+    color = models.CharField(max_length=7, default="#000000")  # ✅ New color field
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.plate_number
