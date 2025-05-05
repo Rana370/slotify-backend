@@ -122,17 +122,21 @@ class VehicleViewSet(APIView):
 class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated]
+    queryset = Reservation.objects.all()
 
     def get(self):
         return Reservation.objects.all()
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        print(request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+    # def post(self, request):
+    #     serializer = self.serializer_class(data=request.data)
+    #     print(request)
+    #     print(request.data)
+    #     if serializer.is_valid():
+    #         serializer.save(user=request.user)
+    #         return Response(serializer.data, status=201)
+    #     return Response(serializer.errors, status=400)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 # --------------------------
