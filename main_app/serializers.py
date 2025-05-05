@@ -31,6 +31,7 @@ class CompanySerializer(serializers.ModelSerializer):
 # Garage Serializer
 # --------------------------
 class GarageSerializer(serializers.ModelSerializer):
+    available_spots = serializers.SerializerMethodField()
     company = CompanySerializer(read_only=True)
     company_id = serializers.PrimaryKeyRelatedField(
         queryset=Company.objects.all(), source='company', write_only=True
@@ -38,7 +39,10 @@ class GarageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Garage
-        fields = ['id', 'name', 'location', 'company', 'company_id']
+        fields = ['id', 'name', 'location', 'company', 'company_id', 'available_spots']
+
+    def get_available_spots(self, obj):
+        return ParkingSpot.objects.filter(garage=obj.id, is_available=True).count()
 
 # --------------------------
 # Parking Spot Serializer with 'is_reserved'

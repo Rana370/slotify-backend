@@ -8,19 +8,11 @@ from .views import (
     GarageViewSet,
     CompanyViewSet,
     ParkingSpotViewSet,
-    RegisterView,
+    CreateUserView,
     LoginView,               
     GarageDetail,
     VerifyUserView
 )
-
-# Initialize router and register viewsets
-# router = DefaultRouter()
-# router.register(r'vehicles', VehicleViewSet, basename='vehicle')
-# router.register(r'reservations', ReservationViewSet, basename='reservation')
-# router.register(r'parking', ParkingSpotViewSet, basename='parking')
-# router.register(r'garages', GarageViewSet, basename='garage')
-# router.register(r'companies', CompanyViewSet, basename='company')
 
 # Define URL patterns
 urlpatterns = [
@@ -28,7 +20,7 @@ urlpatterns = [
     path('garages/<int:garage_id>/', GarageDetail.as_view(), name='garage-detail'),
     path('garages/<int:garage_id>/spots/', ParkingSpotViewSet.as_view(), name='garage-spots'),
     path('vehicles/', VehicleViewSet.as_view(), name='user-vehicles'),
-    path('users/register/', RegisterView.as_view(), name='register'),   # signup
+    path('users/register/', CreateUserView.as_view(), name='register'),   # signup
     path('users/login/', LoginView.as_view(), name='login'),      # custom login ✅
 
     # (Optional) JWT token endpoints if you still want them

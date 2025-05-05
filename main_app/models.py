@@ -35,10 +35,15 @@ class Vehicle(models.Model):
     def __str__(self):
         return self.plate_number
 
+
+
+
+
 class Reservation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     parking_spot = models.ForeignKey(ParkingSpot, on_delete=models.CASCADE)
+    garage = models.ForeignKey(Garage, on_delete=models.CASCADE, related_name='reservations', null=True)  # ✅ New field
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 

@@ -2,10 +2,8 @@ from rest_framework import viewsets, permissions, generics, serializers, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from rest_framework.serializers import ModelSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Vehicle, Reservation, Garage, Company, ParkingSpot
@@ -58,20 +56,9 @@ class VerifyUserView(APIView):
 # --------------------------
 # ✅ Register View & Serializer
 # --------------------------
-class RegisterSerializer(ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
-
-class RegisterView(generics.CreateAPIView):
+class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+    serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
@@ -79,27 +66,14 @@ class RegisterView(generics.CreateAPIView):
             response = super().create(request, *args, **kwargs)
             user = User.objects.get(username=response.data['username'])
             refresh = RefreshToken.for_user(user)
-            content = {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                'user': response.data
-            }
+            content = {'refresh': str(refresh), 'access': str(refresh.access_token), 'user': response.data }
             return Response(content, status=status.HTTP_201_CREATED)
         except Exception as err:
-            return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({ 'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # --------------------------
 # ✅ Vehicle ViewSet (with type support)
 # --------------------------
-# class VehicleViewSet(APIView):
-#     serializer_class = VehicleSerializer
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self):
-#         return Vehicle.objects.filter(user=self.request.user)
-
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
 
 class VehicleViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -160,9 +134,10 @@ class GarageViewSet(APIView):
             # print("this should be going off")
             garages = Garage.objects.all()
             data = GarageSerializer(garages, many=True)
-            # print(data)
+            print(data, "checking garages")
             return Response(data.data, status=status.HTTP_200_OK)
         except Exception as err:
+            print(str(err), "checking error")
             return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
