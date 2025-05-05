@@ -137,7 +137,7 @@ class GarageViewSet(APIView):
             print(data, "checking garages")
             return Response(data.data, status=status.HTTP_200_OK)
         except Exception as err:
-            print(str(err), "checking error")
+            print(str(err), "checking er")
             return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
