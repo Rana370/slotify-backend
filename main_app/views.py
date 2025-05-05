@@ -123,11 +123,16 @@ class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Reservation.objects.filter(user=self.request.user)
+    def get(self):
+        return Reservation.objects.all()
 
-    def perform_create(self, serializer):
-        ...
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        print(request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 
 # --------------------------
@@ -148,10 +153,10 @@ class GarageViewSet(APIView):
 
     def get(self, request):
         try:
-            print("this should be going off")
+            # print("this should be going off")
             garages = Garage.objects.all()
             data = GarageSerializer(garages, many=True)
-            print(data)
+            # print(data)
             return Response(data.data, status=status.HTTP_200_OK)
         except Exception as err:
             return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
