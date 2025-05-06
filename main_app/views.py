@@ -5,6 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import get_object_or_404
+
 
 from .models import Vehicle, Reservation, Garage, Company, ParkingSpot
 from .serializers import (
@@ -20,7 +22,7 @@ from .serializers import (
 # ✅ Login View
 # --------------------------
 class LoginView(APIView):
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def post(self, request):
         try:
@@ -59,7 +61,7 @@ class VerifyUserView(APIView):
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -75,7 +77,7 @@ class CreateUserView(generics.CreateAPIView):
 # ✅ Vehicle ViewSet (with type support)
 # --------------------------
 
-class VehicleViewSet(APIView):
+class VehicleApiView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -93,25 +95,34 @@ class VehicleViewSet(APIView):
 # --------------------------
 # ✅ Reservation ViewSet
 # --------------------------
-class ReservationViewSet(viewsets.ModelViewSet):
-    serializer_class = ReservationSerializer
+class ReservationAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    queryset = Reservation.objects.all()
 
-    def get(self):
-        return Reservation.objects.all()
+    def get(self, request):
+        reservations = Reservation.objects.filter(user=request.user)
+        serializer = ReservationSerializer(reservations, many=True)
+        return Response(serializer.data)
 
-    # def post(self, request):
-    #     serializer = self.serializer_class(data=request.data)
-    #     print(request)
-    #     print(request.data)
-    #     if serializer.is_valid():
-    #         serializer.save(user=request.user)
-    #         return Response(serializer.data, status=201)
-    #     return Response(serializer.errors, status=400)
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def post(self, request):
+        serializer = ReservationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, pk):
+        reservation = get_object_or_404(Reservation, pk=pk, user=request.user)
+        serializer = ReservationSerializer(reservation, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, pk):
+        reservation = get_object_or_404(Reservation, pk=pk, user=request.user)
+        reservation.delete()
+        return Response({"message": "Reservation deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    # create delete function in view
 
 # --------------------------
 # ✅ Company ViewSet
