@@ -10,6 +10,7 @@ urlpatterns = [
     path('garages/<int:garage_id>/', GarageDetail.as_view(), name='garage-detail'),
     path('garages/<int:garage_id>/spots/', ParkingSpotViewSet.as_view(), name='garage-spots'),
     path('vehicles/', VehicleApiView.as_view(), name='user-vehicles'),
+    path('vehicles/<int:pk>/', VehicleApiView.as_view(),name= 'update-delete'),
     path('users/register/', CreateUserView.as_view(), name='register'),   # signup
     path('users/login/', LoginView.as_view(), name='login'),      # custom login ✅
 

@@ -91,10 +91,52 @@ class VehicleApiView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+    def put(self, request, pk):
+        vehicle = get_object_or_404(Vehicle, pk=pk, user=request.user)
+        serializer = VehicleSerializer(vehicle, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        vehicle = get_object_or_404(Vehicle, pk=pk, user=request.user)
+        vehicle.delete()
+        return Response({"detail": "Vehicle deleted."}, status=status.HTTP_204_NO_CONTENT)
 
 # --------------------------
 # ✅ Reservation ViewSet
 # --------------------------
+# class ReservationAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         reservations = Reservation.objects.filter(user=request.user)
+#         serializer = ReservationSerializer(reservations, many=True)
+#         return Response(serializer.data)
+
+#     def post(self, request):
+#         serializer = ReservationSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save(user=request.user)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def put(self, request, pk):
+#         reservation = get_object_or_404(Reservation, pk=pk, user=request.user)
+#         serializer = ReservationSerializer(reservation, data=request.data, partial=True)
+#         if serializer.is_valid():
+#             serializer.save(user=request.user)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#     def delete(self, request, pk):
+#         reservation = get_object_or_404(Reservation, pk=pk, user=request.user)
+#         reservation.delete()
+#         return Response({"message": "Reservation deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+    # create delete function in view
+
 class ReservationAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -106,7 +148,13 @@ class ReservationAPIView(APIView):
     def post(self, request):
         serializer = ReservationSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            reservation = serializer.save(user=request.user)
+
+            # Mark the parking spot as not available
+            spot = reservation.parking_spot
+            spot.is_available = False
+            spot.save()
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -117,12 +165,17 @@ class ReservationAPIView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def delete(self, request, pk):
         reservation = get_object_or_404(Reservation, pk=pk, user=request.user)
+
+        # Mark the parking spot as available again
+        spot = reservation.parking_spot
+        spot.is_available = True
+        spot.save()
+
         reservation.delete()
         return Response({"message": "Reservation deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
-    # create delete function in view
 
 # --------------------------
 # ✅ Company ViewSet
