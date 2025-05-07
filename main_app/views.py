@@ -177,10 +177,10 @@ class GarageViewSet(APIView):
             # print("this should be going off")
             garages = Garage.objects.all()
             data = GarageSerializer(garages, many=True)
-            print(data, "checking garages")
+            # print(data, "checking garages")
             return Response(data.data, status=status.HTTP_200_OK)
         except Exception as err:
-            print(str(err), "checking er")
+            # print(str(err), "checking er")
             return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
