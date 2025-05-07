@@ -77,7 +77,22 @@ class CreateUserView(generics.CreateAPIView):
 # ✅ Vehicle ViewSet (with type support)
 # --------------------------
 
-class VehicleApiView(APIView):
+# class VehicleApiView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         vehicles = Vehicle.objects.filter(user=request.user)
+#         serializer = VehicleSerializer(vehicles, many=True)
+#         return Response(serializer.data)
+
+#     def post(self, request):
+#         serializer = VehicleSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save(user=request.user)
+#             return Response(serializer.data, status=201)
+#         return Response(serializer.errors, status=400)
+
+class VehicleListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -91,6 +106,23 @@ class VehicleApiView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+class VehicleDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        vehicle = get_object_or_404(Vehicle, pk=pk, user=request.user)
+        serializer = VehicleSerializer(vehicle, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        vehicle = get_object_or_404(Vehicle, pk=pk, user=request.user)
+        vehicle.delete()
+        return Response(status=204)
+
 
 # --------------------------
 # ✅ Reservation ViewSet
