@@ -19,5 +19,6 @@ urlpatterns = [
     path('users/token/', VerifyUserView.as_view(), name='token_refresh'),
     path('reservations/<int:pk>/', ReservationAPIView.as_view(), name='reservation-delete'),
     path('reservations/', ReservationAPIView.as_view(), name='reservation-list-create'),
+    
 
 ]
